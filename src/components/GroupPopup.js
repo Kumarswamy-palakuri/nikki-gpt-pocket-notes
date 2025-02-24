@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const colors = ["#ff6b6b", "#ffcc00", "#6bcf6b", "#6b8cff", "#ff6bcc", "#6b6b6b"];
+const COLORS = ["#FF5733", "#33A8FF", "#33FF57", "#FF33A8", "#FFC300", "#8E44AD"];
 
 const GroupPopup = ({ onClose, onSubmit }) => {
   const [groupName, setGroupName] = useState("");
-  const [selectedColor, setSelectedColor] = useState(colors[0]); // Default color
+  const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const popupRef = useRef(null);
 
   useEffect(() => {
@@ -27,20 +27,17 @@ const GroupPopup = ({ onClose, onSubmit }) => {
           value={groupName} 
           onChange={(e) => setGroupName(e.target.value)} 
         />
-
-        {/* Color Picker */}
         <div className="color-picker">
-          {colors.map((color) => (
-            <div
-              key={color}
-              className={`color-option ${selectedColor === color ? "selected" : ""}`}
-              style={{ background: color }}
+          {COLORS.map(color => (
+            <div 
+              key={color} 
+              className={`color-circle ${color === selectedColor ? "selected" : ""}`} 
+              style={{ backgroundColor: color }} 
               onClick={() => setSelectedColor(color)}
-            ></div>
+            />
           ))}
         </div>
-
-        <button onClick={() => onSubmit(groupName, selectedColor)}>Create</button>
+        <button onClick={() => onSubmit(groupName, selectedColor)} disabled={!groupName.trim()}>Create</button>
       </div>
     </div>
   );

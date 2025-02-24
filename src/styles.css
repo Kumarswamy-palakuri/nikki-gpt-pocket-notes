@@ -210,3 +210,36 @@
   margin-top: 10px;
   cursor: pointer;
 }
+/* Color Picker */
+.color-picker {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.color-circle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin: 0 5px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.color-circle.selected {
+  border: 2px solid black;
+}
+
+/* Delete Group Button */
+.delete-group-btn {
+  background: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: auto;
+}
+
+.delete-group-btn:hover {
+  color: darkred;
+}
