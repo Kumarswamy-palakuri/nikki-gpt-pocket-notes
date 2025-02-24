@@ -21,14 +21,15 @@ const App = () => {
     localStorage.setItem("groups", JSON.stringify(groups));
   }, [groups]);
 
-  const handleAddGroup = (groupName) => {
+  const handleAddGroup = async (groupName, color) => {
     if (groupName.length < 2 || groups.some(g => g.name.toLowerCase() === groupName.toLowerCase())) return;
-
-    const newGroup = { id: Date.now(), name: groupName, initials: groupName.slice(0, 2).toUpperCase() };
+  
+    const newGroup = { id: Date.now(), name: groupName, initials: groupName.slice(0, 2).toUpperCase(), color };
     setGroups([...groups, newGroup]);
     setSelectedGroup(newGroup.id);
     setIsPopupOpen(false);
   };
+  
 
   return (
     <div className="app-container">

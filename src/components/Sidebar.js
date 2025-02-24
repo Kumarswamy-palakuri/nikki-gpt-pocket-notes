@@ -5,8 +5,12 @@ const Sidebar = ({ groups, selectedGroup, onSelectGroup, onAddGroup }) => {
     <div className="sidebar">
       <h2>Pocket Notes</h2>
       {groups.map(group => (
-        <div key={group.id} className={`group-item ${group.id === selectedGroup ? "active" : ""}`} onClick={() => onSelectGroup(group.id)}>
-          <span className="group-icon">{group.initials}</span>
+        <div 
+          key={group.id} 
+          className={`group-item ${group.id === selectedGroup ? "active" : ""}`} 
+          onClick={() => onSelectGroup(group.id)}
+        >
+          <span className="group-icon" style={{ background: group.color }}>{group.initials}</span>
           {group.name}
         </div>
       ))}
@@ -14,5 +18,6 @@ const Sidebar = ({ groups, selectedGroup, onSelectGroup, onAddGroup }) => {
     </div>
   );
 };
+
 
 export default Sidebar;

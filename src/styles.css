@@ -12,6 +12,27 @@
   height: 100vh;
 }
 
+/* Color Picker */
+.color-picker {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.color-option {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.color-option.selected {
+  border: 2px solid black;
+}
+
+
 /* Sidebar */
 .sidebar {
   width: 300px;
