@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const COLORS = ["#FF5733", "#33A8FF", "#33FF57", "#FF33A8", "#FFC300", "#8E44AD"];
+const COLORS = [
+  "#FF5733",
+  "#33A8FF",
+  "#33FF57",
+  "#FF33A8",
+  "#FFC300",
+  "#8E44AD",
+];
 
 const GroupPopup = ({ onClose, onSubmit }) => {
   const [groupName, setGroupName] = useState("");
@@ -21,23 +28,32 @@ const GroupPopup = ({ onClose, onSubmit }) => {
     <div className="popup-overlay">
       <div className="popup-content" ref={popupRef}>
         <h3>Create New Group</h3>
-        <input 
-          type="text" 
-          placeholder="Group Name" 
-          value={groupName} 
-          onChange={(e) => setGroupName(e.target.value)} 
+        <div>
+        <label>Group Name</label><input
+          type="text"
+          placeholder="Group Name"
+          value={groupName}
+          onChange={(e) => setGroupName(e.target.value)}
         />
+        </div>
         <div className="color-picker">
-          {COLORS.map(color => (
-            <div 
-              key={color} 
-              className={`color-circle ${color === selectedColor ? "selected" : ""}`} 
-              style={{ backgroundColor: color }} 
+          {COLORS.map((color) => (
+            <div
+              key={color}
+              className={`color-circle ${
+                color === selectedColor ? "selected" : ""
+              }`}
+              style={{ backgroundColor: color }}
               onClick={() => setSelectedColor(color)}
             />
           ))}
         </div>
-        <button onClick={() => onSubmit(groupName, selectedColor)} disabled={!groupName.trim()}>Create</button>
+        <button
+          onClick={() => onSubmit(groupName, selectedColor)}
+          disabled={!groupName.trim()}
+        >
+          Create
+        </button>
       </div>
     </div>
   );
