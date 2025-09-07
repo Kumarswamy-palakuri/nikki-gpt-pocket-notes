@@ -4,40 +4,83 @@ import Notes from "./components/Notes";
 import GroupPopup from "./components/GroupPopup";
 import "./styles.css";
 
+const GROUPS_KEY = "groups";
+const SELECTED_GROUP_KEY = "selectedGroup";
+// Notes are assumed to be stored under key "notes" as an object: { [groupId]: Note[] }
+
 const App = () => {
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  // Load groups from LocalStorage on page load
+  // Initial load: groups + selectedGroup
   useEffect(() => {
-    const savedGroups = JSON.parse(localStorage.getItem("groups")) || [];
-    setGroups(savedGroups);
-    if (savedGroups.length > 0) {
-      setSelectedGroup(savedGroups[0].id);
+    try {
+      const savedGroups = JSON.parse(localStorage.getItem(GROUPS_KEY)) || [];
+      setGroups(savedGroups);
+
+      const savedSelected = localStorage.getItem(SELECTED_GROUP_KEY);
+      const parsedSelected = savedSelected ? JSON.parse(savedSelected) : null;
+
+      // Validate saved selectedGroup still exists
+      const effectiveSelected =
+        parsedSelected && savedGroups.some(g => g.id === parsedSelected)
+          ? parsedSelected
+          : savedGroups.length > 0
+            ? savedGroups[0].id
+            : null;
+
+      setSelectedGroup(effectiveSelected);
+      if (effectiveSelected !== parsedSelected) {
+        localStorage.setItem(SELECTED_GROUP_KEY, JSON.stringify(effectiveSelected));
+      }
+    } catch {
+      // Fallback to empty
+      setGroups([]);
+      setSelectedGroup(null);
+      localStorage.removeItem(GROUPS_KEY);
+      localStorage.removeItem(SELECTED_GROUP_KEY);
     }
   }, []);
 
-  // Save groups to LocalStorage whenever they change
+  // Persist groups whenever they change
   useEffect(() => {
-    localStorage.setItem("groups", JSON.stringify(groups));
+    try {
+      localStorage.setItem(GROUPS_KEY, JSON.stringify(groups));
+    } catch {
+      // ignore storage failures
+    }
   }, [groups]);
+
+  // Persist selectedGroup whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(SELECTED_GROUP_KEY, JSON.stringify(selectedGroup));
+    } catch {
+      // ignore storage failures
+    }
+  }, [selectedGroup]);
 
   // Function to add a new group
   const handleAddGroup = (groupName, color) => {
-    if (groupName.length < 2 || groups.some(g => g.name.toLowerCase() === groupName.toLowerCase())) return;
+    const trimmed = (groupName || "").trim();
+    if (
+      trimmed.length < 2 ||
+      groups.some(g => g.name.toLowerCase() === trimmed.toLowerCase())
+    ) {
+      return;
+    }
 
     const newGroup = {
       id: Date.now(),
-      name: groupName,
-      initials: groupName.slice(0, 2).toUpperCase(),
+      name: trimmed,
+      initials: trimmed.slice(0, 2).toUpperCase(),
       color
     };
 
     const updatedGroups = [...groups, newGroup];
     setGroups(updatedGroups);
     setSelectedGroup(newGroup.id);
-    localStorage.setItem("groups", JSON.stringify(updatedGroups)); // Save to LocalStorage
     setIsPopupOpen(false);
   };
 
@@ -45,15 +88,25 @@ const App = () => {
   const handleDeleteGroup = (groupId) => {
     const updatedGroups = groups.filter(group => group.id !== groupId);
     setGroups(updatedGroups);
-    localStorage.setItem("groups", JSON.stringify(updatedGroups));
 
     // Remove the group's notes from LocalStorage
-    const savedNotes = JSON.parse(localStorage.getItem("notes")) || {};
-    delete savedNotes[groupId];
-    localStorage.setItem("notes", JSON.stringify(savedNotes));
+    try {
+      const savedNotes = JSON.parse(localStorage.getItem("notes")) || {};
+      if (savedNotes && Object.prototype.hasOwnProperty.call(savedNotes, groupId)) {
+        delete savedNotes[groupId];
+        localStorage.setItem("notes", JSON.stringify(savedNotes));
+      } else if (savedNotes && Object.prototype.hasOwnProperty.call(savedNotes, String(groupId))) {
+        // In case keys were strings
+        delete savedNotes[String(groupId)];
+        localStorage.setItem("notes", JSON.stringify(savedNotes));
+      }
+    } catch {
+      // ignore storage failures
+    }
 
     // Update selected group
-    setSelectedGroup(updatedGroups.length > 0 ? updatedGroups[0].id : null);
+    const nextSelected = updatedGroups.length > 0 ? updatedGroups[0].id : null;
+    setSelectedGroup(nextSelected);
   };
 
   return (
@@ -66,7 +119,12 @@ const App = () => {
         onDeleteGroup={handleDeleteGroup}
       />
       {selectedGroup && <Notes groupId={selectedGroup} />}
-      {isPopupOpen && <GroupPopup onClose={() => setIsPopupOpen(false)} onSubmit={handleAddGroup} />}
+      {isPopupOpen && (
+        <GroupPopup
+          onClose={() => setIsPopupOpen(false)}
+          onSubmit={handleAddGroup}
+        />
+      )}
     </div>
   );
 };
